@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Div.Daodao</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+        }
+        #background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #3a3a3a, #1a1a1a);
+        }
+        #money {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            transition: color 0.3s;
+        }
+        #money:hover {
+            color: #00ff00;
+        }
+        #sendButton {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: #3a3a3a;
+            color: #ffffff;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        #sendButton:hover {
+            background-color: #555555;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div id="background"></div>
+    <div id="money">0 money</div>
+    <button id="sendButton">Send to Account</button>
+
+    <script>
+        let money = 0;
+        const incrementPerSecond = 5000; // Increment by 5000 money every second
+        const moneyElement = document.getElementById('money');
+        const sendButton = document.getElementById('sendButton');
+        const bankAccount = '1976278463'; // Example bank account
+
+        const updateMoneyDisplay = (money) => {
+            moneyElement.textContent = `${money} money`;
+        };
+
+        const sendToBankAccount = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/send_money', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ bank_account: bankAccount, amount: money })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    console.log(data.message);
+                } else {
+                    console.error(data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        };
+
+        const moneyClock = setInterval(() => {
+            money += incrementPerSecond;
+            updateMoneyDisplay(money);
+        }, 1000);
+
+        sendButton.addEventListener('click', sendToBankAccount);
+    </script>
+</body>
+</html>
